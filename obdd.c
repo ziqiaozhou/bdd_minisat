@@ -294,30 +294,29 @@ static uintptr_t obdd_decompose_main(FILE *out, int n, obdd_t *p,
       a[s++] = -(p->v);
       p = p->lo;
     }
-    if (p == obdd_top){
+    if (p == obdd_top) {
       printf("decompose find one solution\n");
       uintptr_t result = func(out, s, n, a);
+
+      if (total < UINTPTR_MAX - result)
+        total += result;
+      else
+        total = UINTPTR_MAX;
     }
 
-    if (total < UINTPTR_MAX - result)
-      total += result;
-    else
-      total = UINTPTR_MAX;
+    if (t <= 0)
+      break; // b is empty
+    p = b[--t];
+    while (a[--s] > 0)
+      ;
+    a[s] = abs(a[s]);
+    s++;
+    p = p->hi;
   }
 
-  if (t <= 0)
-    break; // b is empty
-  p = b[--t];
-  while (a[--s] > 0)
-    ;
-  a[s] = abs(a[s]);
-  s++;
-  p = p->hi;
-}
-
-free(b);
-free(a);
-return total;
+  free(b);
+  free(a);
+  return total;
 }
 
 /* \brief print a partial assignment that is stored in a.
